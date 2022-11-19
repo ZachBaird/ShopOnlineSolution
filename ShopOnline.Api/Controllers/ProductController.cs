@@ -15,18 +15,22 @@ public class ProductController : ControllerBase
         _productDbService = productDbService;
     }
 
-    [HttpGet]
-    [Route("/list")]
+    [HttpGet("list")]
     public async Task<ActionResult<List<ProductDto>>> GetProducts()
     {
         var products = await _productDbService.GetProductsAsync();
-        var results = products.Select(async p => new ProductDto()
+        if (products.Count == 0)
+            return NotFound();
+
+        var productCategories = await _productDbService.GetCategoriesAsync();
+
+        var results = products.Select(p => new ProductDto()
         { 
             Id = p.Id,
             Name = p.Name,
             Description = p.Description,
             CategoryId = p.CategoryId,
-            CategoryName = (await _productDbService.GetCategoryByIdAsync(p.CategoryId)).Name,
+            CategoryName = productCategories.First(pc => pc.Id == p.CategoryId).Name,
             Qty = p.Qty,
             ImageUrl = p.ImageUrl,
             Price = p.Price,
@@ -35,11 +39,13 @@ public class ProductController : ControllerBase
         return Ok(results);
     }
 
-    [HttpGet]
-    [Route("/{id}")]
-    public async Task<ActionResult<ProductDto>> GetProduct([FromQuery] int productId)
+    [HttpGet("{id:int}")]
+    public async Task<ActionResult<ProductDto>> GetProduct(int id)
     {
-        var product = await _productDbService.GetProductByIdAsync(productId);
+        var product = await _productDbService.GetProductByIdAsync(id);
+        if (product == null)
+            return NotFound();
+
         return Ok(new ProductDto()
         {
             Id = product.Id,

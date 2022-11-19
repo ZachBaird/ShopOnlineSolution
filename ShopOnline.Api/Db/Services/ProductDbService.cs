@@ -29,7 +29,7 @@ public class ProductDbService : IDiSingleton
     }
 
     /// <summary>
-    /// Returns a <see cref="ProductCategory"/> with the passed in id. It is assumed it exists.
+    /// Returns a <see cref="ProductCategory"/> with the passed in id.
     /// </summary>
     public async Task<ProductCategory> GetCategoryByIdAsync(int id)
     {
@@ -51,7 +51,7 @@ public class ProductDbService : IDiSingleton
     }
 
     /// <summary>
-    /// Gets a <see cref="Product"/> with the passed in id. It is assumed it exists.
+    /// Gets a <see cref="Product"/> with the passed in id.
     /// </summary>
     public async Task<Product> GetProductByIdAsync(int id)
     {
