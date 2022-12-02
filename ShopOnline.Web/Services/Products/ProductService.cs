@@ -1,5 +1,6 @@
 ﻿using ShopOnline.Models.Dtos;
 using System.Net.Http.Json;
+using Paths = ShopOnline.Web.Core.ApiPaths;
 
 namespace ShopOnline.Web.Services.Products;
 
@@ -15,49 +16,36 @@ public class ProductService : IProductService
 
     public async Task<ProductDto> GetProductByIdAsync(int id)
     {
-        try
+        var response = await _httpClient.GetAsync(Paths.GetProduct(id));
+        if (response.IsSuccessStatusCode)
         {
-            var response = await _httpClient.GetAsync($"api/product/{id}");
-            if (response.IsSuccessStatusCode)
-            {
-                if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
-                    return new ProductDto();
+            return await response.Content.ReadFromJsonAsync<ProductDto>();
+        }
+        else
+        {
+            if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+                throw new Exception("No product was found with this id!");
 
-                return await response.Content.ReadFromJsonAsync<ProductDto>();
-            }
-            else
-            {
-                var message = await response.Content.ReadAsStringAsync();
-                throw new Exception($"Http status code: {response.StatusCode} message: {message}");
-            }
+            var message = await response.Content.ReadAsStringAsync();
+            throw new HttpRequestException($"Http status code: {response.StatusCode} message: {message}");
         }
-        catch (Exception)
-        {
-            throw;
-        }
+
     }
 
     public async Task<List<ProductDto>> GetProductsAsync()
     {
-        try
+        var response = await _httpClient.GetAsync(Paths.GetProductsList);
+        if (response.IsSuccessStatusCode)
         {
-            var response = await _httpClient.GetAsync("api/product/list");
-            if (response.IsSuccessStatusCode)
-            {
-                if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
-                    return new List<ProductDto>();
-
-                return await response.Content.ReadFromJsonAsync<List<ProductDto>>();
-            }
-            else
-            {
-                var message = await response.Content.ReadAsStringAsync();
-                throw new Exception($"Http status code: {response.StatusCode} message: {message}");
-            }
+            return await response.Content.ReadFromJsonAsync<List<ProductDto>>();
         }
-        catch (Exception)
+        else
         {
-            throw;
+            if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+                throw new Exception("No products in the system!");
+
+            var message = await response.Content.ReadAsStringAsync();
+            throw new HttpRequestException($"Http status code: {response.StatusCode} message: {message}");
         }
     }
 }

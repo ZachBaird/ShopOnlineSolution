@@ -44,7 +44,7 @@ public class ProductController : ControllerBase
     {
         var product = await _productDbService.GetProductByIdAsync(id);
         if (product == null)
-            return NotFound();
+            return NoContent();
 
         return Ok(new ProductDto()
         {

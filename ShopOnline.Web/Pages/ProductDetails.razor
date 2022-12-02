@@ -1,14 +1,15 @@
-﻿@using ShopOnline.Web.Components.BaseComponents
+﻿@using ShopOnline.Web.Components
+@using ShopOnline.Web.Components.BaseComponents
 @page "/products/{Id:int}"
 @inherits ProductDetailsBase
 
 @if (CurrentProduct == null && string.IsNullOrWhiteSpace(ErrorMessage))
 {
-    <h3>Loading product..</h3>
+    <Spinner />
 }
 else if (!string.IsNullOrWhiteSpace(ErrorMessage))
 {
-    <h3 class="text-danger">@ErrorMessage</h3>
+    <DisplayError ErrorMessage="@ErrorMessage" />
 }
 else
 {
@@ -23,6 +24,11 @@ else
             <p class="mb-4">
                 <b>@CurrentProduct.Price.ToString("C")&nbsp;(@CurrentProduct.Qty units in stock)</b>
             </p>
+            <div>
+                <button class="btn btn-success">
+                    <b>Add to cart</b>
+                </button>
+            </div>
         </div>
     </div>
 }
